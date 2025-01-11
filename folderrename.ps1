@@ -1,11 +1,15 @@
 # Specify the path where your artist folders are located
 $basePath = "J:\All Music\_Sorted\Electronic\Psy-Trance"
 $codecFolders = Get-ChildItem -Path $basePath -Directory
+$count = 0
+
+Write-Host ""
+Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+Write-Output "Renaming Artist folders to include album numbers"
+Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 foreach ($codec in $codecFolders) {
     # Get all artist folders in the base path
     $artistFolders = Get-ChildItem -Path $codec -Directory
-    Write-Output $artistFolders
-    # break
     foreach ($folder in $artistFolders) {
         # Count all files, including those in nested subfolders
         $albumCount = (Get-ChildItem -Path $folder.FullName -Directory | Measure-Object).Count
@@ -25,10 +29,18 @@ foreach ($codec in $codecFolders) {
         # Rename the folder if the new name is different
         if ($cleanFolderPath -ne $newFolderPath) {
             Rename-Item -Path $cleanFolderPath -NewName $newFolderPath
-            Write-Output "Renamed '$($folder.FullName)' to '$newFolderPath'"
+            $count++
+
+            # Display a processing indicator with a continuous '+'
+            Write-Host -NoNewline "+"
         }
     }
 }
 
-Write-Output "Folders renamed to include file counts."
-
+# Newline for clean output after processing
+Write-Host ""
+Write-Host ""
+Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+Write-Output "$count folders renamed to include album counts."
+Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
+Write-Host ""
