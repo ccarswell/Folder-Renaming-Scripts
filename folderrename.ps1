@@ -1,5 +1,6 @@
 # Specify the path where your artist folders are located
-$basePath = "J:\All Music\_Sorted\Electronic\Psy-Trance"
+# $basePath = "J:\All Music\_Sorted\Electronic\Psy-Trance"
+$basePath = "J:\All Music\_Sorted\Electronic\Progressive Trance"
 $codecFolders = Get-ChildItem -Path $basePath -Directory
 $count = 0
 
@@ -20,8 +21,13 @@ foreach ($codec in $codecFolders) {
 
         Rename-Item -Path $folder.FullName -NewName $cleanFolderPath
 
-        # Create the new folder name by appending the file count
-        $newFolderName = "$cleanFolderName ($albumCount albums)"
+        if ($albumCount -eq 1){
+            # Create the new folder name by appending the file count
+            $newFolderName = "$cleanFolderName ($albumCount album)"
+        } else {
+            # Create the new folder name by appending the file count
+            $newFolderName = "$cleanFolderName ($albumCount albums)"
+        }
 
         # Build the full path for the renamed folder
         $newFolderPath = Join-Path -Path $folder.Parent.FullName -ChildPath $newFolderName
