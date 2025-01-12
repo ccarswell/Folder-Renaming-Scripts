@@ -1,31 +1,29 @@
 # Specify the path where your artist folders are located
-# $basePath = "J:\All Music\_Sorted\Electronic\Psy-Trance"
-# $basePath = "J:\All Music\_Sorted\Electronic\Progressive Trance"
+$basePath = "J:\All Music\_Sorted\Electronic\Progressive Trance"
 $basePath = "J:\All Music\_Sorted\Electronic\Psy-Trance"
 $codecFolders = Get-ChildItem -Path $basePath -Directory
 $count = 0
 
 Write-Host ""
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
-Write-Output "Renaming Artist folders to include album numbers"
+Write-Output "Renaming Artist folders to include release numbers"
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 foreach ($codec in $codecFolders) {
     # Get all artist folders in the base path
     $artistFolders = Get-ChildItem -Path $codec -Directory
     foreach ($folder in $artistFolders) {
         # Count all files, including those in nested subfolders
-        $albumCount = (Get-ChildItem -Path $folder.FullName -Directory | Measure-Object).Count
+        $releaseCount = (Get-ChildItem -Path $folder.FullName -Directory | Measure-Object).Count
         
         # Clean the folders before processing again
-        $cleanFolderName = $folder.Name -replace '\s\(\d+\s(album|albums)\)', ''
-        $cleanFolderPath = Join-Path -Path $folder.Parent.FullName -ChildPath $cleanFolderName
-
-        if ($albumCount -eq 1){
+        $cleanFolderName = $folder.Name -replace '\s\(\d+\s(release|releases)\)', ''
+        
+        if ($releaseCount -eq 1){
             # Create the new folder name by appending the file count
-            $newFolderName = "$cleanFolderName ($albumCount album)"
+            $newFolderName = "$cleanFolderName ($releaseCount release)"
         } else {
             # Create the new folder name by appending the file count
-            $newFolderName = "$cleanFolderName ($albumCount albums)"
+            $newFolderName = "$cleanFolderName ($releaseCount releases)"
         }
 
         # Build the full path for the renamed folder
@@ -45,6 +43,6 @@ foreach ($codec in $codecFolders) {
 Write-Host ""
 Write-Host ""
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
-Write-Output "$count folders renamed to include album counts."
+Write-Output "$count folders renamed to include release counts."
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 Write-Host ""
