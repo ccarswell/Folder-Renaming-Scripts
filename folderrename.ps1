@@ -4,7 +4,6 @@ Write-Output "Renaming Artist folders to include release numbers"
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 $count = 0
 
-
 # Specify the path where your artist folders are located
 $foldersToRename = @(
     [pscustomobject]@{
@@ -17,7 +16,8 @@ $foldersToRename = @(
 
 function renameArtistFolders {
     param (
-        [array]$artistFolders
+        [array]$artistFolders,
+        [ref]$count
         )
     foreach ($folder in $artistFolders) {
         # Count all files, including those in nested subfolders
@@ -37,9 +37,9 @@ function renameArtistFolders {
         # Build the full path for the renamed folder
         $newFolderPath = Join-Path -Path $folder.Parent.FullName -ChildPath $newFolderName
         # Rename the folder if the new name is different
-        if ($folder -ne $newFolderPath) {
+        if ($folder.FullName -ne $newFolderPath) {
             Rename-Item -Path $folder -NewName $newFolderPath
-            $count++
+            $count.Value++
 
             # Display a processing indicator with a continuous '+'
             Write-Host -NoNewline "+"
@@ -53,7 +53,7 @@ foreach ($tem in $foldersToRename){
     foreach ($codec in $codecFolders) {
         # Get all artist folders in the base path
         $artistFolders = Get-ChildItem -Path $codec -Directory
-        renameArtistFolders $artistFolders
+        renameArtistFolders $artistFolders -count ([ref]$count) #Global count variable needs to be used as a reference and passed through
         
     }
 }
