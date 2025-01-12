@@ -1,16 +1,24 @@
-# Specify the path where your artist folders are located
-$basePath = "J:\All Music\_Sorted\Electronic\Progressive Trance"
-$basePath = "J:\All Music\_Sorted\Electronic\Psy-Trance"
-$codecFolders = Get-ChildItem -Path $basePath -Directory
-$count = 0
-
 Write-Host ""
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 Write-Output "Renaming Artist folders to include release numbers"
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
-foreach ($codec in $codecFolders) {
-    # Get all artist folders in the base path
-    $artistFolders = Get-ChildItem -Path $codec -Directory
+$count = 0
+
+
+# Specify the path where your artist folders are located
+$foldersToRename = @(
+    [pscustomobject]@{
+        folderPath  = 'J:\All Music\_Sorted\Electronic\Progressive Trance'
+    },
+    [pscustomobject]@{
+        folderPath  = 'J:\All Music\_Sorted\Electronic\Psy-Trance' 
+    }
+)
+
+function renameArtistFolders {
+    param (
+        [array]$artistFolders
+        )
     foreach ($folder in $artistFolders) {
         # Count all files, including those in nested subfolders
         $releaseCount = (Get-ChildItem -Path $folder.FullName -Directory | Measure-Object).Count
@@ -36,6 +44,17 @@ foreach ($codec in $codecFolders) {
             # Display a processing indicator with a continuous '+'
             Write-Host -NoNewline "+"
         }
+    }
+}
+foreach ($tem in $foldersToRename){
+    
+    $style = $foldersToRename.folderPath
+    $codecFolders = Get-ChildItem -Path $style -Directory
+    foreach ($codec in $codecFolders) {
+        # Get all artist folders in the base path
+        $artistFolders = Get-ChildItem -Path $codec -Directory
+        renameArtistFolders $artistFolders
+        
     }
 }
 
