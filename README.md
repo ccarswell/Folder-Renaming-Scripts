@@ -19,6 +19,9 @@ The script is configurable and can be pointed at different library roots, with e
 - - They already have the correct name.
 - - A target folder with the desired name already exists.
 - - They are listed in the exclusions array.
+-  Merges folders if:
+- - An existing folder name already exists (without the release number)
+- - "Ace Ventura" and "Ace Ventura (4 releases)" will be merged into "Ace Ventura (5 releases)"
 
 ## Configuration
 The script uses a separate config file: folderrename.config.ps1

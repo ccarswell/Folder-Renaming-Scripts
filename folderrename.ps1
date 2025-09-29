@@ -12,29 +12,51 @@ function renameArtistFolders {
         [array]$artistFolders,
         [ref]$count
         )
-    foreach ($folder in $artistFolders) {
-        # Count all files, including those in nested subfolders
-        $releaseCount = (Get-ChildItem -Path $folder.FullName -Directory | Measure-Object).Count
-        
-        # Clean the folders before processing again
-        $cleanFolderName = $folder.Name -replace '\s\(\d+\s(release|releases)\)', ''
-        
-        if ($releaseCount -eq 1){
-            # Create the new folder name by appending the file count
-            $newFolderName = "$cleanFolderName ($releaseCount release)"
-        } else {
-            # Create the new folder name by appending the file count
-            $newFolderName = "$cleanFolderName ($releaseCount releases)"
+
+    # Step 1: Group folders by base artist name
+    $grouped = $artistFolders | Group-Object {
+        ($_.Name -replace '\s\(\d+\s(release|releases)\)', '')}
+
+
+ foreach ($group in $grouped) {
+        $baseName = $group.Name
+        $folders = $group.Group
+
+        # Step 2: Pick the first folder as the target
+        $targetFolder = $folders | Select-Object -First 1
+        $otherFolders = $folders | Where-Object { $_.FullName -ne $targetFolder.FullName }
+
+        # Step 3: Move releases from duplicates into target
+        foreach ($dup in $otherFolders) {
+            $subfolders = Get-ChildItem -Path $dup.FullName -Directory
+            foreach ($sub in $subfolders) {
+                $dest = Join-Path -Path $targetFolder.FullName -ChildPath $sub.Name
+                if (-not (Test-Path $dest)) {
+                    Move-Item -Path $sub.FullName -Destination $targetFolder.FullName
+                } else {
+                    # optional: handle naming conflicts
+                    $timestamp = (Get-Date).ToString("yyyyMMddHHmmss")
+                    Move-Item -Path $sub.FullName -Destination (Join-Path $targetFolder.FullName "$($sub.Name)_dup_$timestamp")
+                }
+            }
+            # Remove empty duplicate folder
+            Remove-Item -Path $dup.FullName -Force
         }
 
-        # Build the full path for the renamed folder
-        $newFolderPath = Join-Path -Path $folder.Parent.FullName -ChildPath $newFolderName
-        # Rename the folder if the new name is different
-        if ($folder.FullName -ne $newFolderPath) {
-            Rename-Item -Path $folder.FullName -NewName $newFolderName
-            $count.Value++
+        # Step 4: Count total releases in the consolidated target
+        $releaseCount = (Get-ChildItem -Path $targetFolder.FullName -Directory | Measure-Object).Count
 
-            # Display a processing indicator with a continuous '+'
+        # Step 5: Rename target folder
+        $newFolderName = if ($releaseCount -eq 1) {
+            "$baseName ($releaseCount release)"
+        } else {
+            "$baseName ($releaseCount releases)"
+        }
+
+        $newFolderPath = Join-Path -Path $targetFolder.Parent.FullName -ChildPath $newFolderName
+        if ($targetFolder.FullName -ne $newFolderPath) {
+            Rename-Item -Path $targetFolder.FullName -NewName $newFolderName
+            $count.Value++
             Write-Host -NoNewline "+"
         }
     }
