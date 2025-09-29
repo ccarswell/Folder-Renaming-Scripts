@@ -8,5 +8,5 @@ $FoldersToRename = @(
 
 # Exclusions (folder names to skip, case-insensitive)
 $Exclusions = @(
-    '_Compilation Albums'
+    ''
 )

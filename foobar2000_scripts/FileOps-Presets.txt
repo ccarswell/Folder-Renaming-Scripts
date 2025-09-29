@@ -12,7 +12,7 @@ overwrite=yes
 name=Move to Compilations Folder
 operation=move
 targetDirectory=F:\All Music\_Sorted\Electronic\
-fileNamePattern=%style%\%codec%\'_Compilation Albums'\%year% - %album%\%filename%
+fileNamePattern=%style%\%codec%\'_Compilation Albums'\%year% - %album% by %album artist% - %DISCOGS_LABEL%\%filename%
 moveOtherFiles=yes
 overwrite=yes
 
