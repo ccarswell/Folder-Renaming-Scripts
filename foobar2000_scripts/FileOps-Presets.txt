@@ -1,0 +1,27 @@
+﻿# This is a foo_fileops copy/move/link preset list file.
+# Use | character in preset names to create menu hierarchy: groupname|presetname.
+
+[preset]
+name=Copy to Mix Folder
+operation=copy
+targetDirectory=F:\All Music\Mixes
+fileNamePattern=%style%\%codec%\%filename%
+overwrite=yes
+
+[preset]
+name=Move to Compilations Folder
+operation=move
+targetDirectory=F:\All Music\_Sorted\Electronic\
+fileNamePattern=%style%\%codec%\'_Compilation Albums'\%year% - %album%\%filename%
+moveOtherFiles=yes
+overwrite=yes
+
+[preset]
+name=Move to Sorted Folders
+operation=move
+targetDirectory=F:\All Music\_Sorted
+fileNamePattern=%genre%\%style%\%codec%\%album artist%\%date% %album artist% - %album%\%filename%
+moveOtherFiles=yes
+showOutput=yes
+overwrite=yes
+
