@@ -1,18 +1,11 @@
+# Load config (adjust path if needed)
+. "$PSScriptRoot\folderrename.config.ps1"
+
 Write-Host ""
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 Write-Output "Renaming Artist folders to include release numbers"
 Write-Output "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-="
 $count = 0
-
-# Specify the path where your artist folders are located
-$foldersToRename = @(
-    [pscustomobject]@{
-        folderPath  = 'J:\All Music\_Sorted\Electronic\Progressive Trance'
-    },
-    [pscustomobject]@{
-        folderPath  = 'J:\All Music\_Sorted\Electronic\Psy-Trance' 
-    }
-)
 
 function renameArtistFolders {
     param (
@@ -38,7 +31,7 @@ function renameArtistFolders {
         $newFolderPath = Join-Path -Path $folder.Parent.FullName -ChildPath $newFolderName
         # Rename the folder if the new name is different
         if ($folder.FullName -ne $newFolderPath) {
-            Rename-Item -Path $folder -NewName $newFolderPath
+            Rename-Item -Path $folder.FullName -NewName $newFolderName
             $count.Value++
 
             # Display a processing indicator with a continuous '+'
@@ -46,17 +39,22 @@ function renameArtistFolders {
         }
     }
 }
-foreach ($tem in $foldersToRename){
-    
-    $style = $foldersToRename.folderPath
+foreach ($tem in $foldersToRename) {
+    $style = $tem.folderPath   # use the current item, not the whole array
     $codecFolders = Get-ChildItem -Path $style -Directory
     foreach ($codec in $codecFolders) {
         # Get all artist folders in the base path
-        $artistFolders = Get-ChildItem -Path $codec -Directory
-        renameArtistFolders $artistFolders -count ([ref]$count) #Global count variable needs to be used as a reference and passed through
+        $artistFolders = Get-ChildItem -Path $codec.FullName -Directory |
+            Where-Object { $Exclusions -notcontains $_.Name }
         
+        # Write-Output "Codec folder: $($codec.FullName)"
+        # Write-Output "Artist folders found: $($artistFolders.FullName)"
+        
+        # Call the function if you want it to actually rename
+        renameArtistFolders -artistFolders $artistFolders -count ([ref]$count)
     }
 }
+
 
 # Newline for clean output after processing
 Write-Host ""
